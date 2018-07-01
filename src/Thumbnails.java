@@ -1,4 +1,5 @@
 import java.awt.AWTException;
+import java.awt.Dimension;
 import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
@@ -22,12 +23,12 @@ public class Thumbnails {
         	        	
         	Robot robot = new Robot();
         	
-        	TimeUnit.SECONDS.sleep(3);
+        	TimeUnit.SECONDS.sleep(2);
         	
         	
         	String trackName = "Pyrex";
         	
-        	typeString(robot,trackName);
+        	//typeString(robot,trackName);
         	
         	//TimeUnit.SECONDS.sleep(3);
         	
@@ -37,8 +38,9 @@ public class Thumbnails {
         	String format = "jpg";
         	String fileName = "FullScreenshot."+format;
         	
-        	Rectangle screenRect = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
-        	BufferedImage screenFullImage = robot.createScreenCapture(screenRect);
+        	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        	Rectangle captureRect = new Rectangle(180, 410, 430, 270);
+        	BufferedImage screenFullImage = robot.createScreenCapture(captureRect);
         	ImageIO.write(screenFullImage, format, new File(fileName));
         	
         	
