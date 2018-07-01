@@ -1,12 +1,20 @@
 import java.awt.AWTException;
 import java.awt.Robot;
+import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.util.concurrent.TimeUnit;
+
+import javax.imageio.ImageIO;
+
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 
 public class Thumbnails {
 	
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) throws InterruptedException, IOException {
         // Prints "Hello, World" to the terminal window.
         System.out.println("TEST");
         
@@ -17,13 +25,25 @@ public class Thumbnails {
         	TimeUnit.SECONDS.sleep(3);
         	
         	
-        	String trackName = "Oso -= !@ -= Pig!";
+        	String trackName = "Pyrex";
         	
         	typeString(robot,trackName);
         	
-        	TimeUnit.SECONDS.sleep(3);
+        	//TimeUnit.SECONDS.sleep(3);
         	
-        	backSpace(robot, trackName.length());
+        	//backSpace(robot, trackName.length());
+        	
+        	
+        	String format = "jpg";
+        	String fileName = "FullScreenshot."+format;
+        	
+        	Rectangle screenRect = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+        	BufferedImage screenFullImage = robot.createScreenCapture(screenRect);
+        	ImageIO.write(screenFullImage, format, new File(fileName));
+        	
+        	
+        	
+        	
         	
         	
         	
