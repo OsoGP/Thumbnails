@@ -3,6 +3,7 @@ import java.awt.Dimension;
 import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
@@ -19,29 +20,39 @@ public class Thumbnails {
         // Prints "Hello, World" to the terminal window.
         System.out.println("TEST");
         
+        int searchTimeMS = 2500;
+        int imageLoadTimeMS = 2500;
+        
         try {
         	        	
         	Robot robot = new Robot();
         	
-        	TimeUnit.SECONDS.sleep(2);
+        	robot.delay(2000);
         	
         	
-        	String trackName = "Pyrex";
+
+        	String trackName = "Insane";
         	
-        	//typeString(robot,trackName);
+        	typeString(robot,trackName);
+        	
+        	
+        	searchTrack(robot,searchTimeMS);
+    
+        	
+        	robot.delay(imageLoadTimeMS);
+        	screenCap(robot,0);
+        	
+        	returnToSearch(robot);
+        	
+        	backSpace(robot, trackName.length());
         	
         	//TimeUnit.SECONDS.sleep(3);
         	
-        	//backSpace(robot, trackName.length());
         	
         	
-        	String format = "jpg";
-        	String fileName = "FullScreenshot."+format;
         	
-        	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        	Rectangle captureRect = new Rectangle(180, 410, 430, 270);
-        	BufferedImage screenFullImage = robot.createScreenCapture(captureRect);
-        	ImageIO.write(screenFullImage, format, new File(fileName));
+        	
+        	
         	
         	
         	
@@ -68,13 +79,7 @@ public class Thumbnails {
 		for(int i=0; i<str.length(); i++) {
 			char character = str.charAt(i);
 			typeChar(robot,character);
-		}
-		
-		
-		
-		robot.keyPress(KeyEvent.VK_ENTER);
-		
-		
+		}	
 	}
 	
 	public static void typeChar(Robot robot, char chr) {		
@@ -138,4 +143,45 @@ public class Thumbnails {
 		}
 	}
 	
+	public static void screenCap(Robot robot, int index) {
+		try {
+			String format = "jpg";
+			String fileName = "FullScreenshot."+format;
+    	
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			Rectangle captureRect = new Rectangle(180, 410, 430, 270);
+			BufferedImage screenFullImage = robot.createScreenCapture(captureRect);
+			ImageIO.write(screenFullImage, format, new File(fileName));
+		} catch (IOException ex) {
+			System.err.println(ex);
+		}
+	}
+	
+	public static void searchTrack(Robot robot, int searchTimeMS) {
+		robot.keyPress(KeyEvent.VK_ENTER);
+		robot.keyRelease(KeyEvent.VK_ENTER);
+		robot.delay(500);
+		robot.keyPress(KeyEvent.VK_RIGHT);
+		robot.keyRelease(KeyEvent.VK_RIGHT);
+		robot.keyPress(KeyEvent.VK_ENTER);
+		robot.keyRelease(KeyEvent.VK_ENTER);
+		robot.delay(searchTimeMS);
+		robot.keyPress(KeyEvent.VK_CONTROL);
+		robot.keyRelease(KeyEvent.VK_CONTROL);
+	}
+	
+	public static void returnToSearch(Robot robot) {
+		robot.keyPress(KeyEvent.VK_ESCAPE);
+		robot.keyRelease(KeyEvent.VK_ESCAPE);
+		robot.delay(700);
+		robot.keyPress(KeyEvent.VK_ESCAPE);
+		robot.keyRelease(KeyEvent.VK_ESCAPE);
+		robot.delay(100);
+		robot.keyPress(KeyEvent.VK_LEFT);
+		robot.keyRelease(KeyEvent.VK_LEFT);
+		robot.delay(50);
+		robot.keyPress(KeyEvent.VK_ENTER);
+		robot.keyRelease(KeyEvent.VK_ENTER);
+		robot.delay(50);
+	}
 }
