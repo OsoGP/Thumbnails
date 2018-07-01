@@ -30,23 +30,40 @@ public class Thumbnails {
         	robot.delay(2000);
         	
         	
+        	String[] trackList = {"Leviathan","Nix 2","Lunar Power",};
+        	String[] trackIDs = {"420","421","422"};
+        	
+        	
+        	
+        	for(int iter=0; iter<trackList.length; iter++) {
+        		
+        		
+        		
+        		String trackName = trackList[iter];
+            	
+            	typeString(robot,trackName);
+            	
+            	
+            	searchTrack(robot,searchTimeMS);
+        
+            	
+            	robot.delay(imageLoadTimeMS);
+            	screenCap(robot,trackIDs[iter]);
+            	
+            	returnToSearch(robot);
+            	
+            	backSpace(robot, trackName.length());
+            	
+            	robot.delay(1000);
+        		
+        		
+        		
+        		
+        	}
 
-        	String trackName = "Insane";
-        	
-        	typeString(robot,trackName);
         	
         	
-        	searchTrack(robot,searchTimeMS);
-    
-        	
-        	robot.delay(imageLoadTimeMS);
-        	screenCap(robot,0);
-        	
-        	returnToSearch(robot);
-        	
-        	backSpace(robot, trackName.length());
-        	
-        	//TimeUnit.SECONDS.sleep(3);
+        	TimeUnit.SECONDS.sleep(3);
         	
         	
         	
@@ -143,10 +160,10 @@ public class Thumbnails {
 		}
 	}
 	
-	public static void screenCap(Robot robot, int index) {
+	public static void screenCap(Robot robot, String index) {
 		try {
 			String format = "jpg";
-			String fileName = "FullScreenshot."+format;
+			String fileName = index + "." + format;
     	
 			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 			Rectangle captureRect = new Rectangle(180, 410, 430, 270);
@@ -179,9 +196,9 @@ public class Thumbnails {
 		robot.delay(100);
 		robot.keyPress(KeyEvent.VK_LEFT);
 		robot.keyRelease(KeyEvent.VK_LEFT);
-		robot.delay(50);
+		robot.delay(75);
 		robot.keyPress(KeyEvent.VK_ENTER);
 		robot.keyRelease(KeyEvent.VK_ENTER);
-		robot.delay(50);
+		robot.delay(75);
 	}
 }
