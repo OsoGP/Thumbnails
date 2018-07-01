@@ -7,63 +7,86 @@ import java.awt.event.*;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+//thread controlling KILL switch
+class killClass extends Thread{
+	public boolean RUNNING = true;
+	public void run() {
+		
+		Object[] options = { "KILL" };
+		JOptionPane.showOptionDialog(null, "The Fusion Thumbnail Scraper is RUNNING\nClick KILL to kill the program", "FTS",
+		JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
+		null, options, options[0]);
+		
+		RUNNING = false;
+		
+	}
+	public boolean getIsRunning() {
+		return RUNNING;
+	}
+}
 
 public class Thumbnails {
 	
 	public static void main(String[] args) throws InterruptedException, IOException {
-        // Prints "Hello, World" to the terminal window.
-        System.out.println("TEST");
         
-        int searchTimeMS = 2500;
+		//start KILL switch thread
+		killClass killThread = new killClass();
+		killThread.start();
+        
+		//initiliazing search and image load time values (milliseconds)
+        int searchTimeMS = 3000;
         int imageLoadTimeMS = 2500;
         
         try {
         	        	
         	Robot robot = new Robot();
         	
-        	robot.delay(2000);
+        	robot.delay(5000);
+        	        	
+        	String[] trackList = {"Leviathan","Nix 2"};
+        	String[] trackIDs = {"420","421"};
+     
         	
-        	
-        	String[] trackList = {"Leviathan","Nix 2","Lunar Power",};
-        	String[] trackIDs = {"420","421","422"};
-        	
-        	
-        	
-        	for(int iter=0; iter<trackList.length; iter++) {
+        	//looping through each track in the tracklist
+        	for(int iter=0; iter<trackList.length && killThread.getIsRunning(); iter++) {
         		
         		
         		
         		String trackName = trackList[iter];
             	
-            	typeString(robot,trackName);
+        		if(killThread.getIsRunning()) {
+        			typeString(robot,trackName);
+        		}
+            	
+            	if(killThread.getIsRunning()) {
+            		searchTrack(robot,searchTimeMS);
+            	}
+            	
+            	if(killThread.getIsRunning()) {
+            		robot.delay(imageLoadTimeMS);
+            	}
+            	if(killThread.getIsRunning()) {
+            		screenCap(robot,trackIDs[iter]);
+            		returnToSearch(robot);
+            		backSpace(robot, trackName.length());
+            		robot.delay(200);
+            	}
             	
             	
-            	searchTrack(robot,searchTimeMS);
-        
-            	
-            	robot.delay(imageLoadTimeMS);
-            	screenCap(robot,trackIDs[iter]);
-            	
-            	returnToSearch(robot);
-            	
-            	backSpace(robot, trackName.length());
-            	
-            	robot.delay(1000);
-        		
-        		
-        		
-        		
         	}
+        	
+        	killThread.interrupt();
 
         	
         	
-        	TimeUnit.SECONDS.sleep(3);
+        	
         	
         	
         	
@@ -88,7 +111,7 @@ public class Thumbnails {
 	
 	
 	
-	
+	//type out each character of track name using robot
 	public static void typeString(Robot robot, String str) {
 		
 		System.out.println(str);
@@ -99,6 +122,7 @@ public class Thumbnails {
 		}	
 	}
 	
+	//parse character for correct key press(es)
 	public static void typeChar(Robot robot, char chr) {		
 
 		System.out.println("Testing char: " + chr);
@@ -153,6 +177,7 @@ public class Thumbnails {
 			robot.keyRelease(KeyEvent.VK_SHIFT);}	
 	}
 	
+	//press backspace a certain number of times in succession
 	public static void backSpace(Robot robot, int num) {
 		for (int i=0; i<num; i++) {
 			robot.keyPress(KeyEvent.VK_BACK_SPACE);
@@ -160,6 +185,7 @@ public class Thumbnails {
 		}
 	}
 	
+	//Take screenCap at certain portion of screen
 	public static void screenCap(Robot robot, String index) {
 		try {
 			String format = "jpg";
@@ -174,6 +200,7 @@ public class Thumbnails {
 		}
 	}
 	
+	//Search track, wait a load time, then open track details
 	public static void searchTrack(Robot robot, int searchTimeMS) {
 		robot.keyPress(KeyEvent.VK_ENTER);
 		robot.keyRelease(KeyEvent.VK_ENTER);
@@ -187,6 +214,7 @@ public class Thumbnails {
 		robot.keyRelease(KeyEvent.VK_CONTROL);
 	}
 	
+	//return to search bar from track details
 	public static void returnToSearch(Robot robot) {
 		robot.keyPress(KeyEvent.VK_ESCAPE);
 		robot.keyRelease(KeyEvent.VK_ESCAPE);
