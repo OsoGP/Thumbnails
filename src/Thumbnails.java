@@ -132,6 +132,16 @@ public class Thumbnails {
             	}
             	if(killThread.getIsRunning()) {
             		screenCap(robot,IDList[iter]);
+            		
+            	
+            		if(isCapValid(IDList[iter])){
+            			
+            		}
+            		
+            		
+            		
+            		
+            		
             		returnToSearch(robot);
             		backSpace(robot, trackName.length());
             		robot.delay(200);
@@ -303,6 +313,22 @@ public class Thumbnails {
 		robot.delay(75);
 	}
 	
-	
+	public static boolean isCapValid(String ID) throws IOException {
+		
+		File file2= new File("OUTPUT/"+ID+".jpg");
+		  BufferedImage image = ImageIO.read(file2);
+		  
+		  // Getting pixel color by position x and y 
+		  int clr=  image.getRGB(100,200); 
+		  
+		  int  red   = (clr & 0x00ff0000) >> 16;
+		  int  green = (clr & 0x0000ff00) >> 8;
+		  int  blue  =  clr & 0x000000ff;
+		  System.out.println("Red Color value = "+ red);
+		  System.out.println("Green Color value = "+ green);
+		  System.out.println("Blue Color value = "+ blue);
+		  
+		return true;
+	}
 }
 
