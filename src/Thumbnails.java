@@ -4,6 +4,7 @@ import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.*;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
@@ -39,6 +40,64 @@ public class Thumbnails {
 		//start KILL switch thread
 		killClass killThread = new killClass();
 		killThread.start();
+		
+		
+		 
+	            //System.out.print("Enter the file name with extension : ");
+
+	            Scanner input = new Scanner(System.in);
+
+	            File file = new File("INPUT.txt");
+
+	            //determine number of tracks in the file
+	            input = new Scanner(file);
+	            int trackCount = 0;
+	            while (input.hasNextLine()) {
+	            	String line = input.nextLine();
+	                trackCount++;
+	            }
+	            input.close();
+		 
+		 
+	            
+	            //create arrays to hold track IDs and names
+	            String[] IDList = new String[trackCount];
+	            String[] trackList = new String[trackCount];
+	            
+	    	try {	
+	            //place all Track IDs and Names into their respective arrays
+	            int currentID = 0;
+	            input = new Scanner(file);
+	            while (input.hasNextLine()) {
+	                String line = input.nextLine();
+	                for(int i=0; i<line.length(); i++) {
+	                	if(line.charAt(i)==' ') {
+	                		System.out.println("Space at index: " + i);
+	                		IDList[currentID] = line.substring(0, i);
+	                		trackList[currentID] = line.substring(i+1);
+	                		System.out.println("ID is " + IDList[currentID] + " and track name is " + trackList[currentID]);
+	                		currentID++;
+	                		break;
+	                	}
+	                }
+	            }
+	            input.close();
+
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	        }
+		
+		
+		
+		
+	
+		
+		
+		
+		
+		
+		
+		
         
 		//initiliazing search and image load time values (milliseconds)
         int searchTimeMS = 3000;
@@ -49,17 +108,16 @@ public class Thumbnails {
         	Robot robot = new Robot();
         	
         	robot.delay(5000);
-        	        	
-        	String[] trackList = {"Leviathan","Nix 2"};
-        	String[] trackIDs = {"420","421"};
      
-        	
+        	int tracksProcessed=0;
         	//looping through each track in the tracklist
         	for(int iter=0; iter<trackList.length && killThread.getIsRunning(); iter++) {
         		
         		
         		
         		String trackName = trackList[iter];
+        		
+        		System.out.println("Searching: " + trackName);
             	
         		if(killThread.getIsRunning()) {
         			typeString(robot,trackName);
@@ -73,18 +131,26 @@ public class Thumbnails {
             		robot.delay(imageLoadTimeMS);
             	}
             	if(killThread.getIsRunning()) {
-            		screenCap(robot,trackIDs[iter]);
+            		screenCap(robot,IDList[iter]);
             		returnToSearch(robot);
             		backSpace(robot, trackName.length());
             		robot.delay(200);
+            		tracksProcessed++;
             	}
+            	
             	
             	
         	}
         	
         	killThread.interrupt();
 
-        	
+        	Object[] options = { "OK" };
+    		JOptionPane.showOptionDialog(null, "Thumbnail Scraping HALTED \n"
+    				+ " ______________________________ \n"
+    				+ "Tracks submitted:    " + trackList.length + "\n"
+    				+ "Tracks processed:   " + tracksProcessed, "FTS",
+    		JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
+    		null, options, options[0]);
         	
         	
         	
@@ -125,7 +191,7 @@ public class Thumbnails {
 	//parse character for correct key press(es)
 	public static void typeChar(Robot robot, char chr) {		
 
-		System.out.println("Testing char: " + chr);
+		//System.out.println("Testing char: " + chr);
 		
 		//Lowercase, uppercase, and digits
 		
@@ -156,6 +222,13 @@ public class Thumbnails {
 		else if(chr=='=') {
 			robot.keyPress(KeyEvent.VK_EQUALS);
 			robot.keyRelease(KeyEvent.VK_EQUALS);}
+		else if(chr==',') {
+			robot.keyPress(KeyEvent.VK_COMMA);
+			robot.keyRelease(KeyEvent.VK_COMMA);}
+		else if(chr=='.') {
+			robot.keyPress(KeyEvent.VK_PERIOD);
+			robot.keyRelease(KeyEvent.VK_PERIOD);}
+		
 		
 		
 		
@@ -189,7 +262,7 @@ public class Thumbnails {
 	public static void screenCap(Robot robot, String index) {
 		try {
 			String format = "jpg";
-			String fileName = index + "." + format;
+			String fileName = "OUTPUT/" + index + "." + format;
     	
 			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 			Rectangle captureRect = new Rectangle(180, 410, 430, 270);
@@ -229,4 +302,7 @@ public class Thumbnails {
 		robot.keyRelease(KeyEvent.VK_ENTER);
 		robot.delay(75);
 	}
+	
+	
 }
+
