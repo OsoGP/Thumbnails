@@ -43,26 +43,29 @@ public class Thumbnails {
 		
 		
 		 
-	            //System.out.print("Enter the file name with extension : ");
+            //System.out.print("Enter the file name with extension : ");
 
-	            Scanner input = new Scanner(System.in);
+            Scanner input = new Scanner(System.in);
 
-	            File file = new File("INPUT.txt");
+            File file = new File("INPUT.txt");
 
-	            //determine number of tracks in the file
-	            input = new Scanner(file);
-	            int trackCount = 0;
-	            while (input.hasNextLine()) {
+            //determine number of tracks in the file
+            input = new Scanner(file);
+	        int trackCount = 0;
+	        while (input.hasNextLine()) {
 	            	String line = input.nextLine();
 	                trackCount++;
-	            }
-	            input.close();
+	        }
+	        input.close();
 		 
 		 
 	            
-	            //create arrays to hold track IDs and names
-	            String[] IDList = new String[trackCount];
-	            String[] trackList = new String[trackCount];
+	        //create arrays to hold track IDs and names
+	        String[] IDList = new String[trackCount];
+	        String[] trackList = new String[trackCount];
+	        
+	        int invalidCount = 0;
+	        String invalidTracks = "";
 	            
 	    	try {	
 	            //place all Track IDs and Names into their respective arrays
@@ -72,7 +75,6 @@ public class Thumbnails {
 	                String line = input.nextLine();
 	                for(int i=0; i<line.length(); i++) {
 	                	if(line.charAt(i)==' ') {
-	                		System.out.println("Space at index: " + i);
 	                		IDList[currentID] = line.substring(0, i);
 	                		trackList[currentID] = line.substring(i+1);
 	                		System.out.println("ID is " + IDList[currentID] + " and track name is " + trackList[currentID]);
@@ -101,7 +103,7 @@ public class Thumbnails {
         
 		//initiliazing search and image load time values (milliseconds)
         int searchTimeMS = 3000;
-        int imageLoadTimeMS = 2500;
+        int imageLoadTimeMS = 3000;
         
         try {
         	        	
@@ -116,8 +118,6 @@ public class Thumbnails {
         		
         		
         		String trackName = trackList[iter];
-        		
-        		System.out.println("Searching: " + trackName);
             	
         		if(killThread.getIsRunning()) {
         			typeString(robot,trackName);
@@ -135,14 +135,15 @@ public class Thumbnails {
             		
             	
             		if(isCapValid(IDList[iter])){
-            			
+            			returnToSearch(robot);
             		}
+            		else {
+            			returnToSearchINVALID(robot);
+            			invalidCount++;
+            			invalidTracks = invalidTracks + ", '" + trackList[iter] + "'";
+            		}
+            			
             		
-            		
-            		
-            		
-            		
-            		returnToSearch(robot);
             		backSpace(robot, trackName.length());
             		robot.delay(200);
             		tracksProcessed++;
@@ -153,15 +154,24 @@ public class Thumbnails {
         	}
         	
         	killThread.interrupt();
+        	
+        	if(invalidCount==0) {
+        		invalidTracks = "  None";
+        	}
+        	
+        	System.out.println("\n Invalid Tracks: " + invalidTracks);
 
         	Object[] options = { "OK" };
     		JOptionPane.showOptionDialog(null, "Thumbnail Scraping HALTED \n"
     				+ " ______________________________ \n"
     				+ "Tracks submitted:    " + trackList.length + "\n"
-    				+ "Tracks processed:   " + tracksProcessed, "FTS",
+    				+ "Tracks processed:   " + tracksProcessed + "\n"
+    				+ " ______________________________ \n"
+    				+ "Invalid Tracks: " + invalidCount + " (" + invalidTracks.substring(2)+ ")", "FTS",
     		JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
     		null, options, options[0]);
         	
+    		
         	
         	
         	
@@ -238,6 +248,12 @@ public class Thumbnails {
 		else if(chr=='.') {
 			robot.keyPress(KeyEvent.VK_PERIOD);
 			robot.keyRelease(KeyEvent.VK_PERIOD);}
+		else if(chr==';') {
+			robot.keyPress(KeyEvent.VK_SEMICOLON);
+			robot.keyRelease(KeyEvent.VK_SEMICOLON);}
+		else if(chr=='\'') {
+			robot.keyPress(KeyEvent.VK_QUOTE);
+			robot.keyRelease(KeyEvent.VK_QUOTE);}
 		
 		
 		
@@ -313,20 +329,36 @@ public class Thumbnails {
 		robot.delay(75);
 	}
 	
+	public static void returnToSearchINVALID(Robot robot){
+		robot.keyPress(KeyEvent.VK_LEFT);
+		robot.keyRelease(KeyEvent.VK_LEFT);
+		robot.delay(75);
+		robot.keyPress(KeyEvent.VK_ENTER);
+		robot.keyRelease(KeyEvent.VK_ENTER);
+		robot.delay(75);
+	}
+	
 	public static boolean isCapValid(String ID) throws IOException {
 		
 		File file2= new File("OUTPUT/"+ID+".jpg");
-		  BufferedImage image = ImageIO.read(file2);
+		BufferedImage image = ImageIO.read(file2);
 		  
-		  // Getting pixel color by position x and y 
-		  int clr=  image.getRGB(100,200); 
+		// Getting pixel color by position x and y 
+		//int clr=  image.getRGB(100,200);
+		int[] Points = {image.getRGB(100,100),image.getRGB(300,100),image.getRGB(300,200)};
+		int[][] Colors = new int[3][3];
 		  
-		  int  red   = (clr & 0x00ff0000) >> 16;
-		  int  green = (clr & 0x0000ff00) >> 8;
-		  int  blue  =  clr & 0x000000ff;
-		  System.out.println("Red Color value = "+ red);
-		  System.out.println("Green Color value = "+ green);
-		  System.out.println("Blue Color value = "+ blue);
+		for(int i=0; i<3; i++) {
+			Colors[i][0] = (Points[i] & 0x00ff0000) >> 16;
+			Colors[i][1] = (Points[i] & 0x0000ff00) >> 8;
+			Colors[i][2] = Points[i] & 0x000000ff;
+			
+			System.out.println("RGB for Point " + i + ": (" + Colors[i][0] + "," + Colors[i][1] + "," + Colors[i][2] + ")");
+		}
+		
+		if(Colors[0][0]==Colors[1][0]&&Colors[0][0]==Colors[2][0]&&Colors[0][1]==Colors[1][1]&&Colors[0][1]==Colors[2][1]&&Colors[0][2]==Colors[1][2]&&Colors[0][2]==Colors[2][2]) {
+			return false;
+		}
 		  
 		return true;
 	}
